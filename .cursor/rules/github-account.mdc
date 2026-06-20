@@ -1,0 +1,23 @@
+---
+description: Use sibrahimpa1 GitHub account for all git and GitHub operations in this project
+alwaysApply: true
+---
+
+# GitHub Account: sibrahimpa1
+
+Always use the **sibrahimpa1** GitHub account in this project. Never use **senkaibr**.
+
+## Git remotes
+
+Use sibrahimpa1 remotes:
+
+```
+git@github.com:sibrahimpa1/<repo>.git
+```
+
+The `github-sibrahimpa1` alias also works if needed.
+
+## Commands
+
+- `gh` CLI: ensure auth is for `sibrahimpa1` when running GitHub commands for this repo
+- New remotes, clones, and pushes: always use the `github-sibrahimpa1` host alias

@@ -1,0 +1,36 @@
+# Environment
+.env
+venv/
+.venv/
+.claude/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Data volumes (Docker)
+data/neo4j/
+data/qdrant_storage/
+data/graph_extractions.json
+data/chunks.json
+data/ayurveda.db
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
