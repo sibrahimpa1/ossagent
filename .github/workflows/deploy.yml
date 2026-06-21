@@ -43,12 +43,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Build frontend
-            echo "Building frontend..."
-            cd frontend
-            npm install
-            npm run build
-            cd ..
+            # Frontend is pre-built and committed in repository (no npm on VPS)
 
             # Rebuild and restart services
             echo "Rebuilding Docker containers..."

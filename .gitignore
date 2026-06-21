@@ -23,7 +23,7 @@ backup-*/
 
 # Frontend
 frontend/node_modules/
-frontend/dist/
+# frontend/dist/ - committed for deployment (no npm on VPS)
 frontend/.vite/
 
 # IDE
