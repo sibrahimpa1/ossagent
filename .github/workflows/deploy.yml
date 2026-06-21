@@ -80,8 +80,8 @@ jobs:
 
                 if [ "$RECIPE_COUNT" -eq "0" ] || [ -z "$RECIPE_COUNT" ]; then
                   echo "WARNING: Neo4j has no recipe data! Building graph..."
-                  python3 build_graph.py
-                  python3 build_vectors.py
+                  docker compose run --rm app python3 build_graph.py
+                  docker compose run --rm app python3 build_vectors.py
                   echo "Graph and vectors built successfully"
                 fi
                 break
