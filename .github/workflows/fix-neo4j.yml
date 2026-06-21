@@ -1,0 +1,90 @@
+name: Fix Corrupted Neo4j Database
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
+
+      - name: Fix Neo4j Database
+        run: |
+          ssh root@178.128.250.32 << 'ENDSSH'
+            set -e
+            cd /opt/legal-rag-poc
+
+            echo "=== Stopping Neo4j container ==="
+            docker compose down neo4j
+
+            echo ""
+            echo "=== Deleting corrupted Neo4j data ==="
+            rm -rf data/neo4j/*
+            echo "Deleted corrupted data"
+
+            echo ""
+            echo "=== Starting fresh Neo4j container ==="
+            docker compose up -d neo4j
+
+            echo ""
+            echo "=== Waiting for Neo4j to be ready ==="
+            for i in $(seq 1 30); do
+              if docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "RETURN 1" >/dev/null 2>&1; then
+                echo "✓ Neo4j ready after ${i} seconds"
+                break
+              fi
+              echo "Waiting... (${i}s)"
+              sleep 2
+            done
+
+            echo ""
+            echo "=== Verifying Neo4j connection ==="
+            docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "RETURN 1"
+
+            echo ""
+            echo "=== Building graph (this will take a few minutes) ==="
+            docker compose run --rm app python3 build_graph.py
+
+            echo ""
+            echo "=== Building vectors (this will also take a few minutes) ==="
+            docker compose run --rm app python3 build_vectors.py
+
+            echo ""
+            echo "=== Verifying recipe count ==="
+            RECIPE_COUNT=$(docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "MATCH (n:Recipe) RETURN count(n) AS count" --format plain | tail -1 | tr -d '"' || echo "0")
+            echo "Neo4j now has $RECIPE_COUNT recipes"
+
+            echo ""
+            echo "=== Restarting app container ==="
+            docker compose restart app
+
+            echo ""
+            echo "=== Waiting for API to be ready ==="
+            for i in $(seq 1 20); do
+              if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
+                echo "✓ API ready after ${i} seconds"
+                break
+              fi
+              echo "Waiting... (${i}s)"
+              sleep 2
+            done
+
+            echo ""
+            echo "=== Final container status ==="
+            docker compose ps
+
+            echo ""
+            echo "=== Health check ==="
+            curl -s http://localhost:8000/health | python3 -m json.tool || echo "Health check failed"
+
+            echo ""
+            echo "=== ✅ Fix complete! ==="
+          ENDSSH
