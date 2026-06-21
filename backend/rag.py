@@ -16,6 +16,7 @@ from neo4j import GraphDatabase
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchAny
 from sentence_transformers import SentenceTransformer
+import httpx
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
@@ -109,8 +110,24 @@ class DualStoreRAG:
     def __init__(self):
         self.neo4j_driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
         self.qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-        self.embedding_model = SentenceTransformer(EMBEDDING_MODEL)
-        self.anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+        self._embedding_model = None
+        self._anthropic = None
+
+    @property
+    def embedding_model(self):
+        if self._embedding_model is None:
+            self._embedding_model = SentenceTransformer(EMBEDDING_MODEL)
+        return self._embedding_model
+
+    @property
+    def anthropic(self):
+        if self._anthropic is None:
+            # Explicit httpx client avoids proxies kwarg breakage with httpx 0.28+
+            self._anthropic = Anthropic(
+                api_key=ANTHROPIC_API_KEY,
+                http_client=httpx.Client(),
+            )
+        return self._anthropic
 
     def close(self):
         """Close database connections."""
