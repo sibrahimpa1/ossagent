@@ -2,7 +2,7 @@
  * API client for backend communication
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? '/api' : 'http://localhost:8000');
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 class APIClient {
   async request(endpoint, options = {}) {
