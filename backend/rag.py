@@ -16,7 +16,6 @@ from neo4j import GraphDatabase
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchAny
 from sentence_transformers import SentenceTransformer
-import httpx
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
@@ -37,12 +36,12 @@ SUGGESTION_MAX_TOKENS = int(os.getenv("SUGGESTION_MAX_TOKENS", "8192"))
 
 
 def create_anthropic_client() -> Anthropic:
-    """Build Anthropic client with explicit httpx — avoids proxies/httpx version conflicts."""
+    """Build Anthropic client with timeout configuration."""
     if not ANTHROPIC_API_KEY:
         raise RuntimeError("ANTHROPIC_API_KEY is not configured")
     return Anthropic(
         api_key=ANTHROPIC_API_KEY,
-        http_client=httpx.Client(timeout=120.0),
+        timeout=120.0,
     )
 
 
