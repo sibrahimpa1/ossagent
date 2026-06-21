@@ -65,6 +65,15 @@ jobs:
             docker compose rm -sf app 2>/dev/null || true
             docker compose up -d --force-recreate app neo4j qdrant
 
+            echo "Waiting for Neo4j..."
+            for i in $(seq 1 60); do
+              if docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "RETURN 1" >/dev/null 2>&1; then
+                echo "Neo4j ready after ${i}s"
+                break
+              fi
+              sleep 2
+            done
+
             echo "Waiting for API..."
             for i in $(seq 1 30); do
               if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
