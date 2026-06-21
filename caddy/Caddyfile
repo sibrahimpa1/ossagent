@@ -1,5 +1,16 @@
-ossagent.net {
-    reverse_proxy app:8000
+app.ossagent.net {
+    # Reverse proxy API calls to backend
+    handle /api/* {
+        uri strip_prefix /api
+        reverse_proxy app:8000
+    }
+
+    # Serve frontend static files
+    handle {
+        root * /app/frontend/dist
+        try_files {path} /index.html
+        file_server
+    }
 
     header {
         # Security headers
