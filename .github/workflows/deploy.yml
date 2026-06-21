@@ -77,12 +77,16 @@ jobs:
             curl -sf http://localhost:8000/health || { echo "Health check failed"; docker compose logs --tail=80 app; exit 1; }
 
             echo "Warming RAG..."
-            WARM=$(curl -sf -X POST http://localhost:8000/admin/warm-rag) || {
-              echo "RAG warm-up failed"
-              docker compose logs --tail=80 app
+            WARM=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST http://localhost:8000/admin/warm-rag)
+            HTTP_CODE=$(echo "$WARM" | grep "HTTP_CODE" | cut -d: -f2)
+            BODY=$(echo "$WARM" | sed '/HTTP_CODE/d')
+            echo "Response: $BODY"
+            echo "HTTP Code: $HTTP_CODE"
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "RAG warm-up failed with code $HTTP_CODE"
+              docker compose logs --tail=100 app
               exit 1
-            }
-            echo "$WARM"
+            fi
 
             curl -sf https://ossagent.net/health || echo "Public TLS check skipped"
 
