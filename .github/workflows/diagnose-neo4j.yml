@@ -1,0 +1,51 @@
+name: Diagnose Neo4j Issues
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
+
+      - name: Diagnose Neo4j
+        run: |
+          ssh root@178.128.250.32 << 'ENDSSH'
+            set -e
+            cd /opt/legal-rag-poc
+
+            echo "=== Docker Compose Containers ==="
+            docker compose ps
+
+            echo ""
+            echo "=== Neo4j Container Details ==="
+            docker inspect foodporn_neo4j --format='{{json .State}}' | python3 -m json.tool || echo "Container not found"
+
+            echo ""
+            echo "=== Neo4j Logs (last 50 lines) ==="
+            docker compose logs --tail=50 neo4j
+
+            echo ""
+            echo "=== Trying to connect to Neo4j ==="
+            docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "RETURN 1" 2>&1 || echo "Connection failed: $?"
+
+            echo ""
+            echo "=== Neo4j Data Directory ==="
+            ls -lh data/neo4j/ 2>/dev/null || echo "No neo4j data directory"
+
+            echo ""
+            echo "=== Disk Space ==="
+            df -h
+
+            echo ""
+            echo "=== Memory Usage ==="
+            free -h
+          ENDSSH
