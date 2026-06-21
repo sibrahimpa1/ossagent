@@ -1,0 +1,62 @@
+name: Recreate App Container
+
+on:
+  workflow_dispatch:
+
+jobs:
+  recreate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
+
+      - name: Recreate app container
+        run: |
+          ssh root@178.128.250.32 << 'ENDSSH'
+            set -e
+            cd /opt/legal-rag-poc
+
+            echo "=== Verify .env password ==="
+            grep NEO4J_PASSWORD .env
+
+            echo ""
+            echo "=== Stopping and removing app container ==="
+            docker compose down app
+
+            echo ""
+            echo "=== Recreating app container (picks up fresh .env) ==="
+            docker compose up -d app
+
+            echo ""
+            echo "=== Waiting for app to start ==="
+            for i in $(seq 1 20); do
+              if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
+                echo "✓ API ready after ${i} seconds"
+                break
+              fi
+              echo "Waiting... (${i}s)"
+              sleep 2
+            done
+
+            echo ""
+            echo "=== Container status ==="
+            docker compose ps
+
+            echo ""
+            echo "=== App logs (last 30 lines) ==="
+            docker compose logs --tail=30 app
+
+            echo ""
+            echo "=== Health check ==="
+            curl -s http://localhost:8000/health | python3 -m json.tool || echo "Health check failed"
+
+            echo ""
+            echo "=== ✅ App container recreated! ==="
+            echo "Wait 5 minutes for Neo4j rate limit to fully clear, then test the suggestion API."
+          ENDSSH
