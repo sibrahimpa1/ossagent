@@ -39,3 +39,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Operations documentation (contains sensitive info)
+OPERATIONS.md
