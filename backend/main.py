@@ -4,6 +4,7 @@ Exposes REST API for profile/people management and dual-store RAG suggestions.
 """
 
 import json
+import threading
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 from contextlib import asynccontextmanager
@@ -256,7 +257,7 @@ def list_graph_recipes(search: Optional[str] = None) -> List[dict]:
            ingredients
     ORDER BY toLower(r.name)
     """
-    with rag_system.neo4j_driver.session() as session:
+    with get_rag_system().neo4j_driver.session() as session:
         results = session.run(query)
         recipes = []
         for record in results:
@@ -301,7 +302,7 @@ def get_graph_recipe_detail(name: str) -> Optional[dict]:
            imbalances
     LIMIT 1
     """
-    with rag_system.neo4j_driver.session() as session:
+    with get_rag_system().neo4j_driver.session() as session:
         record = session.run(query, name=name).single()
         if not record or not record['name']:
             return None
@@ -341,8 +342,21 @@ def serialize_custom_recipe(recipe: CustomRecipe, favorite_keys: set) -> dict:
     }
 
 
-# Global RAG instance
+# Global RAG instance (lazy-loaded so profile CRUD is available immediately)
 rag_system: Optional[DualStoreRAG] = None
+_rag_lock = threading.Lock()
+
+
+def get_rag_system() -> DualStoreRAG:
+    """Initialize RAG on first use — avoids blocking API startup on model download."""
+    global rag_system
+    if rag_system is None:
+        with _rag_lock:
+            if rag_system is None:
+                print("📡 Initializing dual-store RAG system...")
+                rag_system = DualStoreRAG()
+                print("✅ RAG system ready")
+    return rag_system
 
 
 @asynccontextmanager
@@ -351,18 +365,11 @@ async def lifespan(app: FastAPI):
     global rag_system
 
     print("🌿 Starting Ayurveda Recipe API...")
-
-    # Initialize database
     init_db()
-
-    # Initialize RAG system
-    print("📡 Initializing dual-store RAG system...")
-    rag_system = DualStoreRAG()
-    print("✅ RAG system ready")
+    print("✅ API ready (RAG loads on first suggestion/recipe request)")
 
     yield
 
-    # Cleanup
     if rag_system:
         rag_system.close()
     print("👋 Shutting down")
@@ -396,21 +403,26 @@ app.add_middleware(
 @app.get("/health")
 def health_check():
     """Check system health and database stats."""
+    if rag_system is None:
+        return {
+            "status": "healthy",
+            "rag_ready": False,
+            "db_ok": True,
+        }
+
     try:
-        # Check Neo4j
-        with rag_system.neo4j_driver.session() as session:
+        rag = get_rag_system()
+        with rag.neo4j_driver.session() as session:
             result = session.run("MATCH (n:Recipe) RETURN count(n) as count")
             neo4j_recipe_count = result.single()['count']
 
-        # Check Qdrant
-        collection_info = rag_system.qdrant_client.get_collection(collection_name="ayurveda_theory")
+        collection_info = rag.qdrant_client.get_collection(collection_name="ayurveda_theory")
         qdrant_points = collection_info.points_count
-
-        # Check model
-        model_loaded = rag_system.embedding_model is not None
+        model_loaded = rag.embedding_model is not None
 
         return {
             "status": "healthy",
+            "rag_ready": True,
             "neo4j_recipe_count": neo4j_recipe_count,
             "qdrant_points": qdrant_points,
             "model_loaded": model_loaded,
@@ -641,7 +653,7 @@ def suggest_recipes(profile_id: int, db: Session = Depends(get_db)):
 
     # Call RAG system
     try:
-        result = rag_system.suggest_recipes(
+        result = get_rag_system().suggest_recipes(
             people_data,
             recent_recipe_names=recent_recipes,
             recent_wisdom_chunk_ids=recent_chunks,
@@ -725,9 +737,7 @@ def list_recipes(
     db: Session = Depends(get_db),
 ):
     """List graph recipes and user-written custom recipes."""
-    if rag_system is None:
-        raise HTTPException(status_code=503, detail="RAG system not ready")
-
+    get_rag_system()
     favorite_keys = {f.recipe_key for f in db.query(RecipeFavorite).all()}
     items: List[RecipeListItem] = []
 
@@ -788,9 +798,7 @@ def get_recipe_detail(key: str, db: Session = Depends(get_db)):
     if not key.strip():
         raise HTTPException(status_code=400, detail="Recipe key is required")
 
-    if rag_system is None:
-        raise HTTPException(status_code=503, detail="RAG system not ready")
-
+    get_rag_system()
     favorite_keys = {f.recipe_key for f in db.query(RecipeFavorite).all()}
 
     if key.startswith("custom:"):
