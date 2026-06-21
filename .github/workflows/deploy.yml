@@ -80,9 +80,22 @@ jobs:
 
                 if [ "$RECIPE_COUNT" -eq "0" ] || [ -z "$RECIPE_COUNT" ]; then
                   echo "WARNING: Neo4j has no recipe data! Building graph..."
-                  docker compose run --rm app python3 build_graph.py
-                  docker compose run --rm app python3 build_vectors.py
-                  echo "Graph and vectors built successfully"
+                  echo "Running build_graph.py..."
+                  docker compose run --rm app python3 build_graph.py 2>&1 | tee /tmp/build_graph.log || echo "build_graph.py failed: $?"
+                  echo "Running build_vectors.py..."
+                  docker compose run --rm app python3 build_vectors.py 2>&1 | tee /tmp/build_vectors.log || echo "build_vectors.py failed: $?"
+
+                  # Verify build succeeded
+                  NEW_COUNT=$(docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "MATCH (n:Recipe) RETURN count(n) AS count" --format plain | tail -1 | tr -d '"' || echo "0")
+                  echo "After build: Neo4j has $NEW_COUNT recipes"
+
+                  if [ "$NEW_COUNT" -gt "0" ]; then
+                    echo "✓ Graph and vectors built successfully!"
+                  else
+                    echo "✗ Graph building failed - Neo4j still has no recipes"
+                    docker compose logs --tail=50 neo4j
+                    exit 1
+                  fi
                 fi
                 break
               fi
