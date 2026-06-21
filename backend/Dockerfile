@@ -2,26 +2,20 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies in stages for better caching
-# First install large ML dependencies that rarely change
+# Pin httpx before anthropic to avoid proxies kwarg breakage
 COPY requirements.txt .
-RUN pip install --no-cache-dir sentence-transformers==2.2.2 numpy==1.24.3
+RUN pip install --no-cache-dir httpx==0.27.2 \
+    && pip install --no-cache-dir -r requirements.txt \
+    && python -c "import httpx; from anthropic import Anthropic; Anthropic(api_key='test', http_client=httpx.Client()); print('anthropic ok')"
 
-# Then install remaining dependencies
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir 'httpx==0.27.2' --force-reinstall
-
-# Copy application code
+# Code is volume-mounted in production; copy for local docker builds
 COPY . .
 
-# Expose port
 EXPOSE 8000
 
-# Run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

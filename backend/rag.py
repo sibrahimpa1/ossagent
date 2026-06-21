@@ -36,6 +36,16 @@ SUGGESTION_MODEL = os.getenv("SUGGESTION_MODEL", "claude-sonnet-4-6")
 SUGGESTION_MAX_TOKENS = int(os.getenv("SUGGESTION_MAX_TOKENS", "8192"))
 
 
+def create_anthropic_client() -> Anthropic:
+    """Build Anthropic client with explicit httpx — avoids proxies/httpx version conflicts."""
+    if not ANTHROPIC_API_KEY:
+        raise RuntimeError("ANTHROPIC_API_KEY is not configured")
+    return Anthropic(
+        api_key=ANTHROPIC_API_KEY,
+        http_client=httpx.Client(timeout=120.0),
+    )
+
+
 def _format_dosha_with_tendency(dosha: str, tendency: Optional[str]) -> str:
     if tendency == "excess":
         return f"{dosha} (in excess)"
@@ -122,11 +132,7 @@ class DualStoreRAG:
     @property
     def anthropic(self):
         if self._anthropic is None:
-            # Explicit httpx client avoids proxies kwarg breakage with httpx 0.28+
-            self._anthropic = Anthropic(
-                api_key=ANTHROPIC_API_KEY,
-                http_client=httpx.Client(),
-            )
+            self._anthropic = create_anthropic_client()
         return self._anthropic
 
     def close(self):

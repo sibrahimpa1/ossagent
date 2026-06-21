@@ -15,10 +15,14 @@ services:
       - NEO4J_PASSWORD=${NEO4J_PASSWORD:-ayurveda123}
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
+      - DATABASE_PATH=data/ayurveda.db
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - EXTRACTION_MODEL=claude-opus-4-8
       - SUGGESTION_MODEL=claude-sonnet-4-6
       - ADMIN_TOKEN=${ADMIN_TOKEN:-test123}
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
     depends_on:
       - neo4j
       - qdrant

@@ -13,11 +13,12 @@ on:
 
 concurrency:
   group: vps-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -29,7 +30,6 @@ jobs:
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
-          # Configure SSH to prevent timeouts during long Docker builds
           cat >> ~/.ssh/config << 'EOF'
           Host 178.128.250.32
             ServerAliveInterval 60
@@ -41,70 +41,61 @@ jobs:
         run: |
           ssh root@178.128.250.32 << 'ENDSSH'
             set -e
-
-            # Navigate to deployment directory
             cd /opt/legal-rag-poc
 
-            # Backup current state
-            echo "Creating backup..."
-            tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz backend/ docker-compose.yml caddy/ || true
-
-            # Pull latest code
             echo "Pulling latest code..."
             git fetch origin main
             git reset --hard origin/main
 
-            # Reload Caddy first so API TLS/domain config applies without waiting for app rebuild
+            mkdir -p data
+
             echo "Reloading Caddy..."
             docker compose up -d caddy
             docker compose restart caddy
-            sleep 8
-            docker compose logs caddy --tail=30
 
-            echo "Testing API over HTTP (pre-TLS)..."
-            curl -sf http://localhost:8000/health || echo "⚠️  App health check failed (may still be rebuilding)"
-
-            # Frontend is pre-built and committed in repository (no npm on VPS)
-
-            # Rebuild and restart backend
-            echo "Rebuilding Docker containers..."
-            docker compose build app
-
-            echo "Restarting services..."
-            docker compose rm -sf app 2>/dev/null || true
-            docker compose up -d --force-recreate --remove-orphans
-
-            # Wait for services to be healthy
-            echo "Waiting for services to start..."
-            sleep 10
-
-            echo "Testing public API TLS..."
-            curl -sf https://ossagent.net/health || echo "⚠️  ossagent.net TLS not ready yet — check: docker compose logs caddy"
-
-            # Check if app is running
-            if docker ps | grep -q foodporn_app; then
-              echo "✅ FoodPorn app is running"
-
-              curl -f http://localhost:8000/health || echo "⚠️  Health check failed"
-
-              echo "Warming RAG (Neo4j + Anthropic client)..."
-              curl -sf -X POST http://localhost:8000/admin/warm-rag || echo "⚠️  RAG warm-up failed — check app logs"
+            CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "backend/requirements.txt")
+            if echo "$CHANGED" | grep -qE 'backend/(Dockerfile|requirements.txt)'; then
+              echo "Dependencies changed — rebuilding app image..."
+              docker compose build app
             else
-              echo "❌ App container not running!"
-              exit 1
+              echo "Code-only change — skipping Docker rebuild (backend is volume-mounted)"
             fi
 
-            # Show logs
-            echo "Recent logs:"
-            docker compose logs --tail=50 app
+            echo "Restarting app..."
+            docker compose rm -sf app 2>/dev/null || true
+            docker compose up -d --force-recreate app neo4j qdrant
+
+            echo "Waiting for API..."
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
+                echo "API up after ${i}s"
+                break
+              fi
+              sleep 2
+            done
+
+            curl -sf http://localhost:8000/health || { echo "Health check failed"; docker compose logs --tail=80 app; exit 1; }
+
+            echo "Warming RAG..."
+            WARM=$(curl -sf -X POST http://localhost:8000/admin/warm-rag) || {
+              echo "RAG warm-up failed"
+              docker compose logs --tail=80 app
+              exit 1
+            }
+            echo "$WARM"
+
+            curl -sf https://ossagent.net/health || echo "Public TLS check skipped"
+
+            echo "Recent app logs:"
+            docker compose logs --tail=30 app
           ENDSSH
 
       - name: Notify deployment status
         if: always()
         run: |
           if [ $? -eq 0 ]; then
-            echo "✅ Deployment successful!"
+            echo "Deployment successful"
           else
-            echo "❌ Deployment failed!"
+            echo "Deployment failed"
             exit 1
           fi

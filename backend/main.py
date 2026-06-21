@@ -439,10 +439,11 @@ def warm_rag():
         rag = get_rag_system()
         with rag.neo4j_driver.session() as session:
             recipe_count = session.run("MATCH (n:Recipe) RETURN count(n) AS count").single()["count"]
-        _ = rag.anthropic  # init API client
+        _ = rag.anthropic
         return {
             "status": "ready",
             "neo4j_recipe_count": recipe_count,
+            "anthropic_ok": True,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RAG warm-up failed: {str(e)}")
@@ -753,11 +754,15 @@ def list_recipes(
     db: Session = Depends(get_db),
 ):
     """List graph recipes and user-written custom recipes."""
-    get_rag_system()
     favorite_keys = {f.recipe_key for f in db.query(RecipeFavorite).all()}
     items: List[RecipeListItem] = []
 
-    for graph_recipe in list_graph_recipes(search=search):
+    try:
+        graph_recipes = list_graph_recipes(search=search)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load graph recipes: {str(e)}")
+
+    for graph_recipe in graph_recipes:
         key = graph_recipe['name']
         is_favorited = key in favorite_keys
         if favorites_only and not is_favorited:
