@@ -449,6 +449,22 @@ def warm_rag():
         raise HTTPException(status_code=500, detail=f"RAG warm-up failed: {str(e)}")
 
 
+@app.get("/admin/docker-status")
+def docker_status():
+    """Check Docker container status (debug endpoint)."""
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["docker", "compose", "ps", "--format", "json"],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        return {"containers": result.stdout, "returncode": result.returncode}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 # Profile endpoints
 @app.get("/profiles", response_model=List[ProfileResponse])
 def get_profiles(db: Session = Depends(get_db)):

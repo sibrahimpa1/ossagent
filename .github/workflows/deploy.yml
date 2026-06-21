@@ -100,6 +100,9 @@ jobs:
 
             curl -sf https://ossagent.net/health || echo "Public TLS check skipped"
 
+            echo "=== Container Status ==="
+            docker compose ps
+
             echo "Recent app logs:"
             docker compose logs --tail=30 app
           ENDSSH

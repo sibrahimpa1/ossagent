@@ -114,7 +114,27 @@ class DualStoreRAG:
     """
 
     def __init__(self):
-        self.neo4j_driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+        import time
+        # Retry Neo4j connection (may not be ready on first request)
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                self.neo4j_driver = GraphDatabase.driver(
+                    NEO4J_URI,
+                    auth=(NEO4J_USER, NEO4J_PASSWORD),
+                    connection_timeout=10.0
+                )
+                # Test connection
+                with self.neo4j_driver.session() as session:
+                    session.run("RETURN 1").consume()
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"Neo4j connection attempt {attempt + 1} failed: {e}. Retrying in 2s...")
+                    time.sleep(2)
+                else:
+                    raise RuntimeError(f"Failed to connect to Neo4j after {max_retries} attempts: {e}")
+
         self.qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         self._embedding_model = None
         self._anthropic = None
