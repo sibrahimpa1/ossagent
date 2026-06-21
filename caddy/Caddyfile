@@ -1,3 +1,7 @@
+{
+    email admin@ossagent.net
+}
+
 ossagent.net {
     # API backend (OSS agent split: frontend on DO, API on VPS)
     handle /api/* {

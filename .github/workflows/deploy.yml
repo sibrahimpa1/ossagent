@@ -50,9 +50,19 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # Reload Caddy first so API TLS/domain config applies without waiting for app rebuild
+            echo "Reloading Caddy..."
+            docker compose up -d caddy
+            docker compose restart caddy
+            sleep 8
+            docker compose logs caddy --tail=30
+
+            echo "Testing API over HTTP (pre-TLS)..."
+            curl -sf http://localhost:8000/health || echo "⚠️  App health check failed (may still be rebuilding)"
+
             # Frontend is pre-built and committed in repository (no npm on VPS)
 
-            # Rebuild and restart services
+            # Rebuild and restart backend
             echo "Rebuilding Docker containers..."
             docker compose build app
 
@@ -62,6 +72,9 @@ jobs:
             # Wait for services to be healthy
             echo "Waiting for services to start..."
             sleep 10
+
+            echo "Testing public API TLS..."
+            curl -sf https://ossagent.net/health || echo "⚠️  ossagent.net TLS not ready yet — check: docker compose logs caddy"
 
             # Check if app is running
             if docker ps | grep -q foodporn_app; then
