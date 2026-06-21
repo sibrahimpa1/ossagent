@@ -432,6 +432,22 @@ def health_check():
         raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
 
 
+@app.post("/admin/warm-rag")
+def warm_rag():
+    """Initialize RAG clients and download embedding model (call after deploy)."""
+    try:
+        rag = get_rag_system()
+        with rag.neo4j_driver.session() as session:
+            recipe_count = session.run("MATCH (n:Recipe) RETURN count(n) AS count").single()["count"]
+        _ = rag.anthropic  # init API client
+        return {
+            "status": "ready",
+            "neo4j_recipe_count": recipe_count,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RAG warm-up failed: {str(e)}")
+
+
 # Profile endpoints
 @app.get("/profiles", response_model=List[ProfileResponse])
 def get_profiles(db: Session = Depends(get_db)):

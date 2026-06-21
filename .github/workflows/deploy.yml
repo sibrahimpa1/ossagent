@@ -85,8 +85,10 @@ jobs:
             if docker ps | grep -q foodporn_app; then
               echo "✅ FoodPorn app is running"
 
-              # Test health endpoint
               curl -f http://localhost:8000/health || echo "⚠️  Health check failed"
+
+              echo "Warming RAG (Neo4j + Anthropic client)..."
+              curl -sf -X POST http://localhost:8000/admin/warm-rag || echo "⚠️  RAG warm-up failed — check app logs"
             else
               echo "❌ App container not running!"
               exit 1

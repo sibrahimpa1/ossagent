@@ -14,7 +14,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir sentence-transformers==2.2.2 numpy==1.24.3
 
 # Then install remaining dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir 'httpx==0.27.2' --force-reinstall
 
 # Copy application code
 COPY . .
