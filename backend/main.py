@@ -13,12 +13,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from backend.database import init_db, get_db
-from backend.models import (
+from database import init_db, get_db
+from models import (
     Profile, Person, DoshaAssignment, DoshaImbalance, SuggestionHistory,
     CustomRecipe, RecipeFavorite,
 )
-from backend.rag import DualStoreRAG, normalize_person_doshas, extract_recipe_names_from_suggestion
+from rag import DualStoreRAG, normalize_person_doshas, extract_recipe_names_from_suggestion
 
 RECENT_RECIPE_DAYS = 7
 
