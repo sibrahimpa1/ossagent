@@ -78,8 +78,11 @@ jobs:
                 RECIPE_COUNT=$(docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "MATCH (n:Recipe) RETURN count(n) AS count" --format plain | tail -1 | tr -d '"' || echo "0")
                 echo "Neo4j has $RECIPE_COUNT recipes"
 
-                if [ "$RECIPE_COUNT" -eq "0" ]; then
-                  echo "WARNING: Neo4j has no recipe data! Graph may need to be rebuilt."
+                if [ "$RECIPE_COUNT" -eq "0" ] || [ -z "$RECIPE_COUNT" ]; then
+                  echo "WARNING: Neo4j has no recipe data! Building graph..."
+                  python3 build_graph.py
+                  python3 build_vectors.py
+                  echo "Graph and vectors built successfully"
                 fi
                 break
               fi
