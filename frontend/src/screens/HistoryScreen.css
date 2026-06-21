@@ -1,0 +1,144 @@
+.history-screen {
+  padding: 30px 22px 28px;
+  min-height: 100vh;
+}
+
+.history-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.history-table-name {
+  font-family: var(--font-heading);
+  font-size: 23px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.history-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.history-empty p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.history-groups {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-day-group {
+  margin-bottom: 26px;
+}
+
+.history-day-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.history-day-name {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.history-day-date {
+  font-size: 11px;
+  color: var(--text-disabled);
+}
+
+.history-day-items {
+  padding-left: 14px;
+  border-left: 2px solid #F0EFEA;
+}
+
+.history-row {
+  align-items: flex-start;
+}
+
+.history-row-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.history-row-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.history-mark-btn {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-green);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.history-mark-btn:hover {
+  text-decoration: underline;
+}
+
+.history-badge {
+  flex: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.history-badge--cooked {
+  color: #fff;
+  background: var(--accent-orange);
+}
+
+.history-badge--suggested {
+  color: var(--text-muted);
+  background: var(--bg-muted);
+}
+
+@media (min-width: 900px) {
+  .history-screen {
+    padding: 0;
+    min-height: auto;
+  }
+
+  .history-day-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .history-row {
+    align-items: center;
+  }
+}

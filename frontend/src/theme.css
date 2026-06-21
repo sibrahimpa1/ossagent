@@ -1,0 +1,212 @@
+/* Ayurvedalove design tokens — from reference mockups */
+
+:root {
+  --bg-page: #EDE8E0;
+  --bg-screen: #FFFFFF;
+  --bg-subtle: #FAF9F6;
+  --bg-muted: #F3F0EA;
+  --bg-warm: #FBF6EE;
+  --bg-warm-border: #EDDFC9;
+
+  --text-primary: #15130F;
+  --text-secondary: #3A3834;
+  --text-muted: #6A665F;
+  --text-disabled: #989388;
+
+  --accent-orange: #C4611A;
+  --accent-green: #1c3328;
+  --accent-green-hover: #16291f;
+  --accent-red: #B5382A;
+
+  --dosha-vata: #7B6FA0;
+  --dosha-vata-soft: rgba(123, 111, 160, 0.12);
+  --dosha-vata-text: #6B5F90;
+  --dosha-pitta: #C4611A;
+  --dosha-pitta-soft: rgba(196, 97, 26, 0.12);
+  --dosha-kapha: #4A7C6E;
+  --dosha-kapha-soft: rgba(74, 124, 110, 0.12);
+  --dosha-kapha-text: #3D6B5E;
+
+  --fit-ideal: #1c3328;
+  --fit-good: #5E7B52;
+  --fit-works: #6A665F;
+
+  --border-subtle: rgba(21, 19, 15, 0.09);
+  --border-light: rgba(21, 19, 15, 0.06);
+  --border-dashed: rgba(0, 0, 0, 0.14);
+
+  --shadow-card: 0 8px 26px -14px rgba(28, 51, 40, 0.22);
+  --shadow-card-sm: 0 6px 20px -16px rgba(28, 51, 40, 0.18);
+  --shadow-screen: 0 24px 60px -28px rgba(28, 51, 40, 0.4);
+  --shadow-cta: 0 14px 30px -12px rgba(28, 51, 40, 0.6);
+
+  --radius-screen: 30px;
+  --radius-card: 18px;
+  --radius-card-sm: 14px;
+  --radius-pill: 9999px;
+
+  --font-heading: 'Sora', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --screen-max: 390px;
+  --sidebar-width: 240px;
+  --bg-main: #FCFAF7;
+  --desktop-max: 1180px;
+}
+
+@media (min-width: 900px) {
+  .mobile-only { display: none !important; }
+}
+
+@media (max-width: 899px) {
+  body {
+    background-color: var(--bg-screen);
+  }
+}
+
+.page-header {
+  display: none;
+}
+
+.page-header-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.page-header-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.page-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.page-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-header-cta {
+  background: var(--accent-green);
+  border: none;
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 11px 20px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 26px -12px rgba(28, 51, 40, 0.6);
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.btn-header-cta:hover {
+  background: var(--accent-green-hover);
+}
+
+.btn-header-outline {
+  background: transparent;
+  border: 1.5px solid var(--accent-green);
+  color: var(--accent-green);
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-header-outline:hover {
+  background: rgba(28, 51, 40, 0.05);
+}
+
+.btn-header-ghost {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-pill-desktop {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .page-header {
+    display: block;
+  }
+
+  .search-pill-desktop {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-pill);
+    padding: 9px 16px;
+  }
+
+  .search-pill-desktop input {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    color: var(--text-primary);
+    outline: none;
+    width: 140px;
+  }
+
+  .search-pill-desktop input::placeholder {
+    color: var(--text-disabled);
+  }
+}
+
+@keyframes rasa-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rasa-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes loading-dot {
+  0%, 80%, 100% { opacity: 0.4; }
+  40% { opacity: 0.9; }
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.section-label-sm {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.home-dot {
+  color: var(--accent-orange);
+}

@@ -1,0 +1,176 @@
+.recipe-method {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recipe-method-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recipe-method-meta-pill {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--bg-muted, #f4f4f5);
+  border: 1px solid var(--border-subtle);
+  min-width: 72px;
+}
+
+.recipe-method-meta-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.recipe-method-meta-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.recipe-method-paragraph {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.recipe-method-intro {
+  color: var(--text-primary);
+}
+
+.recipe-method-summary {
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.recipe-method-subheading {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.recipe-method-block + .recipe-method-block {
+  margin-top: 4px;
+}
+
+.recipe-method-dosha-notes {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #faf8ff 0%, #fff8f3 100%);
+  border: 1px solid rgba(123, 111, 160, 0.15);
+}
+
+.recipe-method-dosha-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recipe-method-dosha-list li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.recipe-method-tip {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fffbeb;
+  border: 1px solid rgba(196, 97, 26, 0.15);
+}
+
+.recipe-method-tip-icon {
+  flex: none;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.recipe-method-tip p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.recipe-method-ingredients {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recipe-method-ingredients li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.recipe-method-ingredients li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+}
+
+.recipe-method-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: recipe-step;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recipe-method-steps li {
+  counter-increment: recipe-step;
+  position: relative;
+  padding-left: 36px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.recipe-method-steps li::before {
+  content: counter(recipe-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--dosha-pitta-soft);
+  color: var(--accent-orange);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

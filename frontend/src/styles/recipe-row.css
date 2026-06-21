@@ -1,0 +1,44 @@
+.recipe-row-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.favorite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card-sm);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-card-sm);
+}
+
+.favorite-row--clickable {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.favorite-row--clickable:hover {
+  border-color: rgba(196, 97, 26, 0.35);
+  box-shadow: 0 2px 10px rgba(196, 97, 26, 0.08);
+}
+
+.favorite-row--clickable:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
+.favorite-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.favorite-source {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

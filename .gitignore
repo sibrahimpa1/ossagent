@@ -11,10 +11,15 @@ __pycache__/
 
 # Data volumes (Docker)
 data/neo4j/
+data/qdrant/
 data/qdrant_storage/
 data/graph_extractions.json
-data/chunks.json
+# data/chunks.json is committed (pre-processed data)
 data/ayurveda.db
+
+# Backups
+*.tar.gz
+backup-*/
 
 # Frontend
 frontend/node_modules/

@@ -1,0 +1,26 @@
+.dosha-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: var(--dosha-color);
+  color: white;
+  opacity: 0.9;
+}
+
+.dosha-chip.primary {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.dosha-chip.secondary {
+  opacity: 0.7;
+}
+
+.dosha-chip.small {
+  padding: 2px 8px;
+  font-size: 11px;
+}

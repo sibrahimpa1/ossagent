@@ -1,0 +1,25 @@
+.dosha-flag {
+  display: inline;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9em;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.dosha-flag--vata {
+  background: var(--dosha-vata-soft);
+  color: var(--dosha-vata-text);
+}
+
+.dosha-flag--pitta {
+  background: var(--dosha-pitta-soft);
+  color: var(--dosha-pitta);
+}
+
+.dosha-flag--kapha {
+  background: var(--dosha-kapha-soft);
+  color: var(--dosha-kapha-text);
+}

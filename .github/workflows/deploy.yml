@@ -1,0 +1,80 @@
+name: Deploy FoodPorn to VPS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'docker-compose.yml'
+      - 'caddy/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        run: |
+          ssh root@178.128.250.32 << 'ENDSSH'
+            set -e
+
+            # Navigate to deployment directory
+            cd /opt/legal-rag-poc
+
+            # Backup current state
+            echo "Creating backup..."
+            tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz backend/ docker-compose.yml caddy/ || true
+
+            # Pull latest code
+            echo "Pulling latest code..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Rebuild and restart services
+            echo "Rebuilding Docker containers..."
+            docker compose build app
+
+            echo "Restarting services..."
+            docker compose up -d
+
+            # Wait for services to be healthy
+            echo "Waiting for services to start..."
+            sleep 10
+
+            # Check if app is running
+            if docker ps | grep -q foodporn_app; then
+              echo "✅ FoodPorn app is running"
+
+              # Test health endpoint
+              curl -f http://localhost:8000/health || echo "⚠️  Health check failed"
+            else
+              echo "❌ App container not running!"
+              exit 1
+            fi
+
+            # Show logs
+            echo "Recent logs:"
+            docker compose logs --tail=50 app
+          ENDSSH
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi

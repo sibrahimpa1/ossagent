@@ -23,6 +23,7 @@ NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "ayurveda123")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+EXTRACTION_MODEL = os.getenv("EXTRACTION_MODEL", "claude-opus-4-8")
 
 # Batch configuration for Claude API calls
 BATCH_SIZE = 5
@@ -219,9 +220,8 @@ class GraphBuilder:
         try:
             # Call Claude API
             message = self.anthropic.messages.create(
-                model="claude-sonnet-4-20250514",
+                model=EXTRACTION_MODEL,
                 max_tokens=2000,
-                temperature=0,
                 messages=[{
                     "role": "user",
                     "content": prompt
@@ -308,12 +308,19 @@ class GraphBuilder:
                     skipped += 1
                     continue
 
+                # Get recipe name and validate
+                recipe_name = extraction.get('recipe_name', chunk.get('recipe_name', f'Recipe {chunk_id}'))
+
+                # Skip recipes with null or empty names
+                if not recipe_name or recipe_name.strip() == '':
+                    skipped += 1
+                    continue
+
                 # Merge Book node
                 source_book = chunk.get('source', 'Unknown')
                 session.run("MERGE (:Book {title: $title})", title=source_book)
 
                 # Create Recipe node
-                recipe_name = extraction.get('recipe_name', chunk.get('recipe_name', f'Recipe {chunk_id}'))
                 session.run(
                     """
                     MERGE (r:Recipe {name: $name})

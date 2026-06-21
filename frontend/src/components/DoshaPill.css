@@ -1,0 +1,129 @@
+.dosha-pill {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  vertical-align: top;
+}
+
+.dosha-pill-name {
+  line-height: 1.1;
+}
+
+.dosha-pill--md {
+  font-size: 9px;
+  padding: 3px 9px;
+}
+
+.dosha-pill--sm {
+  font-size: 8px;
+  padding: 3px 8px;
+  letter-spacing: 0.07em;
+}
+
+.dosha-pill--lg {
+  font-size: 10px;
+  padding: 5px 11px;
+  letter-spacing: 0.07em;
+}
+
+.dosha-pill--filled {
+  color: #fff;
+  background: var(--dosha-bg);
+}
+
+.dosha-pill--outline {
+  color: var(--dosha-text);
+  background: var(--dosha-soft);
+  border: none;
+}
+
+.dosha-pill--secondary {
+  color: var(--dosha-text);
+  background: var(--dosha-soft);
+  font-size: 8px;
+  padding: 3px 8px;
+}
+
+.dosha-pill--imbalance {
+  color: var(--dosha-text);
+  background: transparent;
+  border: 1.5px dashed var(--dosha-bg);
+  font-size: 8px;
+  padding: 2px 7px;
+  letter-spacing: 0.06em;
+}
+
+.dosha-pill-tendency {
+  margin-top: 3px;
+  padding: 0;
+  border-radius: 0;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+  line-height: 1.1;
+  background: transparent;
+  opacity: 0.95;
+}
+
+.dosha-pill--filled .dosha-pill-tendency {
+  opacity: 0.92;
+}
+
+.dosha-pill--imbalance .dosha-pill-tendency,
+.dosha-pill--outline .dosha-pill-tendency {
+  opacity: 1;
+}
+
+/* Uniform chips on person / table cards */
+.person-doshas .dosha-pill,
+.table-person-doshas .dosha-pill {
+  width: 56px;
+  height: 36px;
+  padding: 5px 3px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.person-doshas .dosha-pill-tendency,
+.table-person-doshas .dosha-pill-tendency {
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.person-doshas .dosha-pill--imbalance,
+.table-person-doshas .dosha-pill--imbalance {
+  padding: 4px 3px;
+}
+
+.fit-badge {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.fit-badge--ideal { background: var(--fit-ideal); }
+.fit-badge--good { background: var(--fit-good); }
+.fit-badge--works { background: var(--fit-works); }
+
+.fit-badge--sm {
+  font-size: 8px;
+  padding: 3px 8px;
+  letter-spacing: 0.08em;
+}

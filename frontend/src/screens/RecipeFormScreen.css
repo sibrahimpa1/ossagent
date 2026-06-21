@@ -1,0 +1,278 @@
+.recipe-form-screen {
+  padding: 30px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.recipe-form-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.recipe-form-title {
+  font-family: var(--font-heading);
+  font-size: 23px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.recipe-form-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.field-label:first-child {
+  margin-top: 0;
+}
+
+.field-label .optional {
+  color: var(--text-disabled);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.form-field {
+  width: 100%;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-card-sm);
+  padding: 13px 16px;
+  outline: none;
+}
+
+.form-field--body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+}
+
+.form-field--textarea {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  resize: vertical;
+  min-height: 84px;
+}
+
+.form-field:focus {
+  border-color: var(--accent-orange);
+}
+
+.ingredient-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.ingredient-tag-editable {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-muted);
+  padding: 6px 11px;
+  border-radius: var(--radius-pill);
+}
+
+.ingredient-tag-editable button {
+  color: var(--text-disabled);
+  font-size: 11px;
+  padding: 0;
+  line-height: 1;
+}
+
+.ingredient-tag-editable button:hover {
+  color: var(--accent-red);
+}
+
+.ingredient-add-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.ingredient-add-input {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  outline: none;
+}
+
+.ingredient-add-btn {
+  font-size: 12px;
+  color: var(--accent-orange);
+  font-weight: 600;
+  background: rgba(196, 97, 26, 0.1);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dosha-pill-row {
+  display: flex;
+  gap: 8px;
+}
+
+.dosha-select-pill {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  border: 1.5px solid transparent;
+  transition: all 0.2s;
+}
+
+.dosha-select-pill--vata { border-color: var(--dosha-vata); color: var(--dosha-vata); }
+.dosha-select-pill--pitta { border-color: var(--dosha-pitta); color: var(--dosha-pitta); }
+.dosha-select-pill--kapha { border-color: var(--dosha-kapha); color: var(--dosha-kapha); }
+
+.dosha-select-pill--vata.selected { background: var(--dosha-vata); color: #fff; }
+.dosha-select-pill--pitta.selected { background: var(--dosha-pitta); color: #fff; }
+.dosha-select-pill--kapha.selected { background: var(--dosha-kapha); color: #fff; }
+
+.field-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: -4px 0 12px;
+  line-height: 1.5;
+}
+
+.recipe-imbalance-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.imbalance-group {
+  margin-bottom: 10px;
+}
+
+.imbalance-group-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.imbalance-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.imbalance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.imbalance-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.imbalance-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.imbalance-check.checked {
+  border: none;
+}
+
+.recipe-form-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: auto;
+}
+
+.form-cancel {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (min-width: 900px) {
+  .recipe-form-screen {
+    padding: 0;
+    min-height: auto;
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .recipe-form-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .recipe-form-actions .btn-cta {
+    width: auto;
+    min-width: 180px;
+  }
+}

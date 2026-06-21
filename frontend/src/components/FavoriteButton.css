@@ -1,0 +1,60 @@
+.favorite-btn {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #A8A49C;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.favorite-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+}
+
+.favorite-btn.favorited {
+  background: rgba(196, 97, 26, 0.1);
+  color: var(--accent-orange);
+  border-color: rgba(196, 97, 26, 0.14);
+}
+
+.favorite-btn.favorited:hover {
+  background: rgba(196, 97, 26, 0.16);
+  color: #B85518;
+}
+
+.favorite-btn:active {
+  transform: scale(0.92);
+}
+
+.favorite-btn--sm {
+  width: 30px;
+  height: 30px;
+}
+
+.favorite-btn--lg {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+}
+
+.favorite-btn--lg.favorited {
+  background: rgba(196, 97, 26, 0.1);
+  border-color: rgba(196, 97, 26, 0.18);
+}
+
+.favorite-btn--lg:not(.favorited):hover {
+  border-color: var(--border-light);
+}
