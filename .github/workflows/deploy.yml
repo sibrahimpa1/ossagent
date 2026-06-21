@@ -25,6 +25,13 @@ jobs:
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
+          # Configure SSH to prevent timeouts during long Docker builds
+          cat >> ~/.ssh/config << 'EOF'
+          Host 178.128.250.32
+            ServerAliveInterval 60
+            ServerAliveCountMax 120
+            TCPKeepAlive yes
+          EOF
 
       - name: Deploy to VPS
         run: |
