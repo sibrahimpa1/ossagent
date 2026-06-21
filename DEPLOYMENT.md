@@ -49,7 +49,7 @@ NEO4J_USER=neo4j
 
 Update DigitalOcean App Platform environment variables:
 
-- `VITE_API_URL=https://ossagent.net`
+- `VITE_API_BASE=https://ossagent.net/api`
 - (Remove `VITE_APP_PASSWORD` if no longer needed)
 
 ## VPS Deployment Steps
@@ -218,11 +218,13 @@ The frontend auto-deploys via DigitalOcean App Platform when you push to main.
 
 ### Update Frontend API Client
 
-Edit `frontend/src/api/client.js` to ensure it points to the correct backend:
+Edit `frontend/src/api/client.js` — production builds use `frontend/.env.production`:
 
 ```javascript
-const API_URL = import.meta.env.VITE_API_URL || 'https://ossagent.net';
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 ```
+
+Set `VITE_API_BASE=https://ossagent.net/api` on DigitalOcean App Platform (build-time env).
 
 ### Push to Deploy
 

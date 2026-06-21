@@ -16,10 +16,24 @@ class APIClient {
     };
 
     const response = await fetch(url, config);
+    const contentType = response.headers.get('content-type') || '';
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Request failed' }));
-      throw new Error(error.detail || `HTTP ${response.status}`);
+      if (contentType.includes('application/json')) {
+        const error = await response.json();
+        throw new Error(error.detail || `HTTP ${response.status}`);
+      }
+      throw new Error(
+        contentType.includes('text/html')
+          ? 'API returned HTML instead of JSON — check VITE_API_BASE points to the backend'
+          : `HTTP ${response.status}`
+      );
+    }
+
+    if (!contentType.includes('application/json')) {
+      throw new Error(
+        'API returned a non-JSON response — check VITE_API_BASE points to the backend'
+      );
     }
 
     return response.json();
