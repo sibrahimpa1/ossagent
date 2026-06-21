@@ -449,20 +449,35 @@ def warm_rag():
         raise HTTPException(status_code=500, detail=f"RAG warm-up failed: {str(e)}")
 
 
-@app.get("/admin/docker-status")
-def docker_status():
-    """Check Docker container status (debug endpoint)."""
-    import subprocess
+@app.get("/admin/test-neo4j")
+def test_neo4j():
+    """Test Neo4j connectivity without initializing full RAG system."""
+    from neo4j import GraphDatabase
+    from rag import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+
     try:
-        result = subprocess.run(
-            ["docker", "compose", "ps", "--format", "json"],
-            capture_output=True,
-            text=True,
-            timeout=5
+        driver = GraphDatabase.driver(
+            NEO4J_URI,
+            auth=(NEO4J_USER, NEO4J_PASSWORD),
+            connection_timeout=5.0
         )
-        return {"containers": result.stdout, "returncode": result.returncode}
+        with driver.session() as session:
+            result = session.run("RETURN 1 AS test")
+            test_value = result.single()["test"]
+            recipe_count = session.run("MATCH (n:Recipe) RETURN count(n) AS count").single()["count"]
+        driver.close()
+        return {
+            "neo4j_reachable": True,
+            "test_query": test_value == 1,
+            "recipe_count": recipe_count,
+            "uri": NEO4J_URI
+        }
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "neo4j_reachable": False,
+            "error": str(e),
+            "uri": NEO4J_URI
+        }
 
 
 # Profile endpoints
