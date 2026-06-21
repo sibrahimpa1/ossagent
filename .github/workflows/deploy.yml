@@ -11,6 +11,10 @@ on:
       - 'caddy/**'
       - '.github/workflows/deploy.yml'
 
+concurrency:
+  group: vps-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -67,7 +71,8 @@ jobs:
             docker compose build app
 
             echo "Restarting services..."
-            docker compose up -d
+            docker compose rm -sf app 2>/dev/null || true
+            docker compose up -d --force-recreate --remove-orphans
 
             # Wait for services to be healthy
             echo "Waiting for services to start..."
