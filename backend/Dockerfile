@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
-    && python -c "from anthropic import Anthropic; Anthropic(api_key='test', timeout=120.0); print('anthropic ok')"
+    && python -c "from anthropic import Anthropic; Anthropic(api_key='test'); print('anthropic ok')"
 
 # Code is volume-mounted in production; copy for local docker builds
 COPY . .

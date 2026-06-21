@@ -36,13 +36,10 @@ SUGGESTION_MAX_TOKENS = int(os.getenv("SUGGESTION_MAX_TOKENS", "8192"))
 
 
 def create_anthropic_client() -> Anthropic:
-    """Build Anthropic client with timeout configuration."""
+    """Build Anthropic client."""
     if not ANTHROPIC_API_KEY:
         raise RuntimeError("ANTHROPIC_API_KEY is not configured")
-    return Anthropic(
-        api_key=ANTHROPIC_API_KEY,
-        timeout=120.0,
-    )
+    return Anthropic(api_key=ANTHROPIC_API_KEY)
 
 
 def _format_dosha_with_tendency(dosha: str, tendency: Optional[str]) -> str:
