@@ -1,0 +1,62 @@
+name: Restart Neo4j Container
+
+on:
+  workflow_dispatch:
+
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 178.128.250.32 >> ~/.ssh/known_hosts
+
+      - name: Restart Neo4j and check status
+        run: |
+          ssh root@178.128.250.32 << 'ENDSSH'
+            set -e
+            cd /opt/legal-rag-poc
+
+            echo "=== Current Container Status ==="
+            docker compose ps
+
+            echo ""
+            echo "=== Restarting Neo4j ==="
+            docker compose restart neo4j
+
+            echo ""
+            echo "=== Waiting for Neo4j to be ready ==="
+            for i in $(seq 1 30); do
+              if docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "RETURN 1" >/dev/null 2>&1; then
+                echo "✓ Neo4j ready after ${i}s"
+                break
+              fi
+              sleep 2
+            done
+
+            echo ""
+            echo "=== Checking recipe count ==="
+            RECIPE_COUNT=$(docker compose exec -T neo4j cypher-shell -u neo4j -p ayurveda123 "MATCH (n:Recipe) RETURN count(n) AS count" --format plain | tail -1 | tr -d '"' || echo "0")
+            echo "Neo4j has $RECIPE_COUNT recipes"
+
+            echo ""
+            echo "=== Restarting app container ==="
+            docker compose restart app
+
+            echo ""
+            echo "=== Final Status ==="
+            docker compose ps
+
+            echo ""
+            echo "=== Recent Neo4j logs ==="
+            docker compose logs --tail=30 neo4j
+
+            echo ""
+            echo "=== Recent app logs ==="
+            docker compose logs --tail=20 app
+          ENDSSH
